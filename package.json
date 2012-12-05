@@ -1,0 +1,29 @@
+{
+  "name": "node-svd",
+  "description": "Singular-Value-Decomposition using SVDLIBC",
+  "version": "0.1.0",
+  "homepage": "https://github.com/xionluhnis/node-svd",
+  "engines": {
+    "node": ">=0.4.0"
+  },
+  "dependencies": {
+  },
+  "author": "Alexandre Kaspar <xion.luhnis@gmail.com>",
+	"repository": {
+    "type": "git", 
+		"url": "http://github.com/xionluhnis/node-svd.git"
+	},
+	"bugs": {
+		"url": "http://github.com/xionluhnis/node-svd/issues"
+	},
+  "keywords": ["svd", "math", "linear", "algebra", "SVDLIBC"],
+  "main": "./svd.node",
+  "maintainers": [{
+      "name": "Alexandre Kaspar",
+      "email": "xion.luhnis@gmail.com",
+      "web": "http://www.wox-xion.ch"
+  }],
+	"scripts": {
+		"install": "node-gyp rebuild && cp build/Release/svd.node ./svd.node"
+	}
+}
