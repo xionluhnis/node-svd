@@ -8,12 +8,12 @@ How to use
 
 The module simply provide a function svd of signature:
 ```Javascript
-	/**
-	 * @param A [row1, row2 ...] matrix to apply svd onto
-	 * @param dim the number of singular values to keep, 0 for all (default)
-	 * @param settings { U, V, debug }
-	 * @return {d, U, S, V}
-	 */
+/**
+ * @param A [row1, row2 ...] matrix to apply svd onto
+ * @param dim the number of singular values to keep, 0 for all (default)
+ * @param settings { U, V, debug }
+ * @return {d, U, S, V}
+ */
 ```
 
 About the settings:
@@ -30,9 +30,9 @@ Example
 
 The basic is really simple:
 ```Node.js
-  var svd = require('svd').svd;
-	var res = svd(myMatrix, dim, settings);
-	// use res.U, res.S and res.V
+var svd = require('svd').svd;
+var res = svd(myMatrix, dim, settings);
+// use res.U, res.S and res.V
 ```
 
 Test
@@ -40,11 +40,11 @@ Test
 
 The basic example given in 'test.js' computes the svd of the simple matrix:
 ```Javascript
-  A = [
-	  [1, 2],
-		[3, 4],
-		[5, 6]
-	];
+ A = [
+  [1, 2],
+  [3, 4],
+  [5, 6]
+];
 ```
 
 The resulting U, S and V are displayed, and then the matrix A is recomputed (brute-force implementation of matrix multiplication) by simply multiplying back the parts together.
@@ -55,10 +55,10 @@ Test check with Matlab / Octave
 
 Simply use :
 ```Matlab
-	A = [1, 2; 3, 4; 5, 6];
-	[u, s, v] = svd(A)
-	B = u * s * v
-	C = u(1:3, 1:2) * s(1:2, 1:2) * v
+A = [1, 2; 3, 4; 5, 6];
+[u, s, v] = svd(A)
+B = u * s * v
+C = u(1:3, 1:2) * s(1:2, 1:2) * v
 ```
 
 LICENSE
