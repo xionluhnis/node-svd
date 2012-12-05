@@ -29,7 +29,7 @@ Example
 =======
 
 The basic is really simple:
-```Node.js
+```Javascript
 var svd = require('svd').svd;
 var res = svd(myMatrix, dim, settings);
 // use res.U, res.S and res.V
