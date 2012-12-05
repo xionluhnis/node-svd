@@ -6,9 +6,8 @@ Node.js module for [SVDLIBC](http://tedlab.mit.edu/~dr/SVDLIBC/) providing fast 
 How to install
 ==============
 
-You need **node-gyp** to be available as a command within the environment. Then, assuming it is available, just run:
+You need **node-gyp** to be available as a command within the environment. Then, assuming it is available, simply use:
 
-Simply use
 ```Bash
 npm install node-svd
 ```
