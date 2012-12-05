@@ -11,8 +11,8 @@ using namespace node;
 /**
  * Svd computation using svdlibc
  * 
- * @param args [A, dim, untranspose, debug]
- * @return the computation result
+ * @param args [A, dim, {U, V, debug}]
+ * @return {d, U, S, V}
  */
 Handle<Value> Svd(const Arguments& args) {
     HandleScope scope;
