@@ -1,7 +1,7 @@
 node-svd
 ========
 
-Node.js module for [SVDLIBC](http://tedlab.mit.edu/~dr/SVDLIBC/) providing fast *Singular-Value-Decomposition with ease*.
+Node.js module for [SVDLIBC](http://tedlab.mit.edu/~dr/SVDLIBC/) providing fast *Singular-Value-Decomposition* with ease.
 
 How to use
 ==========
@@ -21,7 +21,7 @@ About the settings:
 * **U** is a boolean setting whether to untranspose the result *Ut* to *U* (true, by default)
 * **V** is a boolean setting whether to untranspose the result *Vt* to *V* (false, by default)
 
-The untransposition is provided because SVDLIBC result provides *Ut* and *Vt*, which are the transposed *U* and *V*, thus of dimensions (*d by m*) and (*d by n*).
+The untransposition is provided because SVDLIBC result provides *Ut* and *Vt*, which are the transposed *U* and *V*, thus of dimensions (d by m) and (d by n).
 *Vt* may be wanted, but if you want to recompute the initial *A*, you need *U* and not *Ut*, thus the default values.
 Note that it doesn't add any overhead.
 
