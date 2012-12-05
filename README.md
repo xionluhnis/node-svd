@@ -7,7 +7,7 @@ How to use
 ==========
 
 The module simply provide a function svd of signature:
-```Javascript
+```Java
 /**
  * @param A [row1, row2 ...] matrix to apply svd onto
  * @param dim the number of singular values to keep, 0 for all (default)
