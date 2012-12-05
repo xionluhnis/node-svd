@@ -20,20 +20,42 @@ Handle<Value> Svd(const Arguments& args) {
     // parsing the arguments
     int rows = 0, cols = 0;
     int dim = 0; // number of dimensions, 0=all by default
-    bool untranspose = false; // whether to untranspose the result
-    Local<Array> m = Array::New(0);
+    bool useU = true, useV = false; // untranspose state
     bool merr = false;
+    Local<Array> m = Array::New(0);
     switch (args.Length()) {
         case 4: // with debug level
             if (!args[3]->IsNumber()) {
                 return ThrowException(Exception::Error(String::New("Debug type must be a number!")));
             }
-            SVDVerbosity = long(args[3]->NumberValue());
-        case 3: // with untranspose
-            if (!args[2]->IsBoolean()) {
-                return ThrowException(Exception::Error(String::New("Untranspose must be a boolean!")));
+            
+        case 3: // with settings
+            if (!args[2]->IsObject()) {
+                return ThrowException(Exception::Error(String::New("Settings must be an object!")));
+            }else{
+                Local<Object> settings = args[2].As<Object>();
+                // debug flag
+                if(settings->Has(String::New("debug"))){
+                    Local<Value> debugValue = settings->Get(String::New("debug"));
+                    if(debugValue->IsNumber()){
+                        SVDVerbosity = long(debugValue->NumberValue());
+                    }
+                }
+                // useU
+                if(settings->Has(String::New("U"))){
+                    Local<Value> uValue = settings->Get(String::New("U"));
+                    if(uValue->IsBoolean()){
+                        useU = uValue->BooleanValue();
+                    }
+                }
+                // useV
+                if(settings->Has(String::New("V"))){
+                    Local<Value> vValue = settings->Get(String::New("V"));
+                    if(vValue->IsBoolean()){
+                        useV = vValue->BooleanValue();
+                    }
+                }
             }
-            untranspose = args[2]->BooleanValue();
         case 2: // with dimension
             if (!args[1]->IsNumber()) {
                 return ThrowException(Exception::Error(String::New("Dimension must be a number!")));
@@ -87,7 +109,8 @@ Handle<Value> Svd(const Arguments& args) {
     res->Set(String::New("d"), Number::New(dim = rec->d));
     // Ut vector
     Local<Array> U;
-    if (untranspose) {
+    if (useU) {
+        // let's untranspose
         U = Array::New(rows);
         for (int y = 0; y < rows; ++y) {
             Local<Array> row = Array::New(dim);
@@ -113,7 +136,8 @@ Handle<Value> Svd(const Arguments& args) {
     res->Set(String::New("S"), S);
     // Vt vector
     Local<Array> V;
-    if (untranspose) {
+    if (useV) {
+        // let's untranspose
         V = Array::New(cols);
         for (int y = 0; y < cols; ++y) {
             Local<Array> row = Array::New(dim);
