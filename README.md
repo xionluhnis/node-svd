@@ -1,13 +1,13 @@
 node-svd
 ========
 
-Node.js module for SVDLIBC providing fast Singular-Value-Decomposition with ease.
+Node.js module for [SVDLIBC](http://tedlab.mit.edu/~dr/SVDLIBC/) providing fast *Singular-Value-Decomposition with ease*.
 
 How to use
 ==========
 
 The module simply provide a function svd of signature:
-```Java
+```Javascript
 /**
  * @param A [row1, row2 ...] matrix to apply svd onto
  * @param dim the number of singular values to keep, 0 for all (default)
@@ -17,9 +17,9 @@ The module simply provide a function svd of signature:
 ```
 
 About the settings:
-* debug is a number from 0, 1 (default) and 2 describing the verbosity
-* U is a boolean setting whether to untranspose the result Ut to U (true, by default)
-* V is a boolean setting whether to untranspose the result Vt to V (false, by default)
+* **debug** is a number from 0, 1 (default) and 2 describing the verbosity
+* **U** is a boolean setting whether to untranspose the result Ut to U (true, by default)
+* **V** is a boolean setting whether to untranspose the result Vt to V (false, by default)
 
 The untransposition is provided because SVDLIBC result provides Ut and Vt, which are the transposed U and V, thus of dimensions (d by m) and (d by n).
 Vt may be wanted, but if you want to recompute the initial A, you need U and not Ut, thus this default.
