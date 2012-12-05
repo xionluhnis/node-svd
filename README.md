@@ -3,6 +3,16 @@ node-svd
 
 Node.js module for [SVDLIBC](http://tedlab.mit.edu/~dr/SVDLIBC/) providing fast *Singular-Value-Decomposition* with ease.
 
+How to install
+==============
+
+You need **node-gyp** to be available as a command within the environment. Then, assuming it is available, just run:
+
+Simply use
+```Bash
+npm install node-svd
+```
+
 How to use
 ==========
 
