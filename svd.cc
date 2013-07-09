@@ -1,9 +1,12 @@
-#include "node.h"
-#include "v8.h"
-
+// C part for SVD
 extern "C" {
 #include "svdlib.h"
 }
+
+//#define BUILDING_NODE_EXTENSION
+#include "node.h"
+#include "v8.h"
+
 
 using namespace v8;
 using namespace node;
@@ -163,8 +166,8 @@ Handle<Value> Svd(const Arguments& args) {
     return scope.Close(res);
 }
 
-void Init(Handle<Object> target) {
+void InitSVD(Handle<Object> target) {
     target->Set(String::NewSymbol("svd"), FunctionTemplate::New(Svd)->GetFunction());
 }
 
-NODE_MODULE(svd, Init)
+NODE_MODULE(svd, InitSVD)

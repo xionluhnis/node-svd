@@ -1,7 +1,7 @@
 {
   "name": "node-svd",
   "description": "Singular-Value-Decomposition using SVDLIBC",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/xionluhnis/node-svd",
   "engines": {
     "node": ">=0.4.0"
