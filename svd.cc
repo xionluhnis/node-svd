@@ -3,13 +3,21 @@ extern "C" {
 #include "svdlib.h"
 }
 
-//#define BUILDING_NODE_EXTENSION
 #include "node.h"
 #include "v8.h"
 
 
-using namespace v8;
-using namespace node;
+namespace node_svd {
+
+using v8::Exception;
+using v8::FunctionCallbackInfo;
+using v8::Isolate;
+using v8::Local;
+using v8::Number;
+using v8::Object;
+using v8::String;
+using v8::Value;
+using v8::Array;
 
 /**
  * Svd computation using svdlibc
@@ -17,43 +25,46 @@ using namespace node;
  * @param args [A, dim, {U, V, debug}]
  * @return {d, U, S, V}
  */
-Handle<Value> Svd(const Arguments& args) {
-    HandleScope scope;
+void Svd(const FunctionCallbackInfo<Value>& args) {
+
+    Isolate* isolate = args.GetIsolate();
 
     // parsing the arguments
     int rows = 0, cols = 0;
     int dim = 0; // number of dimensions, 0=all by default
     bool useU = true, useV = false; // untranspose state
     bool merr = false;
-    Local<Array> m = Array::New(0);
+    Local<Array> m = Array::New(isolate, 0);
     switch (args.Length()) {
         case 4: // with debug level
             if (!args[3]->IsNumber()) {
-                return ThrowException(Exception::Error(String::New("Debug type must be a number!")));
+                isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Debug type must be a number!")));
+                return;
             }
             
         case 3: // with settings
             if (!args[2]->IsObject()) {
-                return ThrowException(Exception::Error(String::New("Settings must be an object!")));
+                isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Settings must be an object!")));
+                return;
             }else{
-                Local<Object> settings = args[2].As<Object>();
+                Local<Object> settings = args[2]->ToObject();
                 // debug flag
-                if(settings->Has(String::New("debug"))){
-                    Local<Value> debugValue = settings->Get(String::New("debug"));
+                if(settings->Has(String::NewFromUtf8(isolate, "debug"))){
+                    Local<Value> debugValue = settings->Get(String::NewFromUtf8(isolate, "debug"));
                     if(debugValue->IsNumber()){
                         SVDVerbosity = long(debugValue->NumberValue());
                     }
                 }
                 // useU
-                if(settings->Has(String::New("U"))){
-                    Local<Value> uValue = settings->Get(String::New("U"));
+                if(settings->Has(String::NewFromUtf8(isolate, "U"))){
+                    Local<Value> uValue = settings->Get(String::NewFromUtf8(isolate, "U"));
                     if(uValue->IsBoolean()){
                         useU = uValue->BooleanValue();
                     }
                 }
                 // useV
-                if(settings->Has(String::New("V"))){
-                    Local<Value> vValue = settings->Get(String::New("V"));
+                if(settings->Has(String::NewFromUtf8(isolate, "V"))){
+                    Local<Value> vValue = settings->Get(String::NewFromUtf8(isolate, "V"));
                     if(vValue->IsBoolean()){
                         useV = vValue->BooleanValue();
                     }
@@ -61,39 +72,42 @@ Handle<Value> Svd(const Arguments& args) {
             }
         case 2: // with dimension
             if (!args[1]->IsNumber()) {
-                return ThrowException(Exception::Error(String::New("Dimension must be a number!")));
+                isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Dimension must be a number!")));
+                return;
             }
             dim = int(args[1]->NumberValue());
         case 1: // only A
             if (!args[0]->IsArray()) {
                 merr = true;
             } else {
-                m = args[0].As<Array > ();
+                m = Local<Array>::Cast(args[0]);
                 rows = m->Length();
                 if (rows == 0) {
                     merr = true;
                 } else {
-                    Local<Value> v0 = m->Get(Number::New(0));
+                    Local<Value> v0 = m->Get(Number::New(isolate, 0));
                     if (!v0->IsArray()) merr = true;
                     else {
-                        Local<Array> r0 = v0.As<Array > ();
+                        Local<Array> r0 = Local<Array>::Cast(v0);
                         cols = r0->Length();
                         if (cols == 0) merr = true;
                     }
                 }
             }
             if (merr) {
-                return ThrowException(Exception::Error(String::New("First argument must be a non-empty matrix of number!")));
+                isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "First argument must be a non-empty matrix of number!")));
+                return;
             }
             break;
         default:
-            return ThrowException(Exception::Error(String::New("Requires at least a matrix argument!")));
+            isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Requires at least a matrix argument!")));
+            return;
     }
 
     // 1 = create matrix and populate it
     DMat D = svdNewDMat(rows, cols);
     for (int y = 0; y < rows; ++y) {
-        Local<Array> row = m->Get(y).As<Array > ();
+        Local<Array> row = Local<Array>::Cast(m->Get(y));
         for (int x = 0; x < cols; ++x) {
             D->value[y][x] = row->Get(x)->NumberValue();
         }
@@ -107,67 +121,69 @@ Handle<Value> Svd(const Arguments& args) {
     svdFreeSMat(A);
 
     // 3 = wrap result
-    Local<Object> res = Object::New();
+    Local<Object> res = Object::New(isolate);
     // Dimension
-    res->Set(String::New("d"), Number::New(dim = rec->d));
+    res->Set(String::NewFromUtf8(isolate, "d"), Number::New(isolate, dim = rec->d));
     // Ut vector
     Local<Array> U;
     if (useU) {
         // let's untranspose
-        U = Array::New(rows);
+        U = Array::New(isolate, rows);
         for (int y = 0; y < rows; ++y) {
-            Local<Array> row = Array::New(dim);
+            Local<Array> row = Array::New(isolate, dim);
             for (int x = 0; x < dim; ++x) {
-                row->Set(x, Number::New(rec->Ut->value[x][y]));
+                row->Set(x, Number::New(isolate, rec->Ut->value[x][y]));
             }
             U->Set(y, row);
         }
     } else {
-        U = Array::New(dim);
+        U = Array::New(isolate, dim);
         for (int x = 0; x < dim; ++x) {
-            Local<Array> trow = Array::New(rows);
+            Local<Array> trow = Array::New(isolate, rows);
             for (int y = 0; y < rows; ++y) {
-                trow->Set(y, Number::New(rec->Ut->value[x][y]));
+                trow->Set(y, Number::New(isolate, rec->Ut->value[x][y]));
             }
             U->Set(x, trow);
         }
     }
-    res->Set(String::New("U"), U);
+    res->Set(String::NewFromUtf8(isolate, "U"), U);
     // Singular values
-    Local<Array> S = Array::New(rec->d);
-    for (int s = 0; s < rec->d; ++s) S->Set(s, Number::New(rec->S[s]));
-    res->Set(String::New("S"), S);
+    Local<Array> S = Array::New(isolate, rec->d);
+    for (int s = 0; s < rec->d; ++s) S->Set(s, Number::New(isolate, rec->S[s]));
+    res->Set(String::NewFromUtf8(isolate, "S"), S);
     // Vt vector
     Local<Array> V;
     if (useV) {
         // let's untranspose
-        V = Array::New(cols);
+        V = Array::New(isolate, cols);
         for (int y = 0; y < cols; ++y) {
-            Local<Array> row = Array::New(dim);
+            Local<Array> row = Array::New(isolate, dim);
             for (int x = 0; x < dim; ++x) {
-                row->Set(x, Number::New(rec->Vt->value[x][y]));
+                row->Set(x, Number::New(isolate, rec->Vt->value[x][y]));
             }
             V->Set(y, row);
         }
     } else {
-        V = Array::New(dim);
+        V = Array::New(isolate, dim);
         for (int x = 0; x < dim; ++x) {
-            Local<Array> trow = Array::New(cols);
+            Local<Array> trow = Array::New(isolate, cols);
             for (int y = 0; y < cols; ++y) {
-                trow->Set(y, Number::New(rec->Vt->value[x][y]));
+                trow->Set(y, Number::New(isolate, rec->Vt->value[x][y]));
             }
             V->Set(x, trow);
         }
     }
-    res->Set(String::New("V"), V);
+    res->Set(String::NewFromUtf8(isolate, "V"), V);
     // release result memory finally
     svdFreeSVDRec(rec);
 
-    return scope.Close(res);
+    args.GetReturnValue().Set(res);
 }
 
-void InitSVD(Handle<Object> target) {
-    target->Set(String::NewSymbol("svd"), FunctionTemplate::New(Svd)->GetFunction());
+void InitSVD(Local<Object> exports) {
+    NODE_SET_METHOD(exports, "svd", Svd);
 }
 
 NODE_MODULE(svd, InitSVD)
+
+}
