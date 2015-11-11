@@ -5,6 +5,8 @@ Node.js module for [SVDLIBC](http://tedlab.mit.edu/~dr/SVDLIBC/) providing fast 
 
 Changes
 =======
+  * **0.1.3** - Now works with node version 0.12 and above
+
   * **0.1.2** - changed the Init method to InitSVD because of a name conflict with the new version of node
 
 How to install
